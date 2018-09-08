@@ -1,5 +1,6 @@
 package com.github.monkeywie.proxyee.handler;
 
+import com.github.monkeywie.proxyee.WXhref;
 import com.github.monkeywie.proxyee.crt.CertPool;
 import com.github.monkeywie.proxyee.exception.HttpProxyExceptionHandle;
 import com.github.monkeywie.proxyee.intercept.HttpProxyIntercept;
@@ -13,26 +14,15 @@ import com.github.monkeywie.proxyee.util.ProtoUtil;
 import com.github.monkeywie.proxyee.util.ProtoUtil.RequestProto;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.proxy.ProxyHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.resolver.NoopAddressResolverGroup;
 import io.netty.util.ReferenceCountUtil;
+
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -77,6 +67,16 @@ public class HttpProxyServerHandle extends ChannelInboundHandlerAdapter {
   public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
     if (msg instanceof HttpRequest) {
       HttpRequest request = (HttpRequest) msg;
+
+      DefaultHttpRequest dr = (DefaultHttpRequest) request;
+      HttpHeaders headers = dr.headers();
+      //headers
+      String uri = request.uri();
+      if (uri.endsWith("json")) {
+        WXhref.ff("https://mp.weixin.qq.com" + uri, headers);
+      }
+
+
       //第一次建立连接取host和端口号和处理代理握手
       if (status == 0) {
         RequestProto requestProto = ProtoUtil.getRequestProto(request);
