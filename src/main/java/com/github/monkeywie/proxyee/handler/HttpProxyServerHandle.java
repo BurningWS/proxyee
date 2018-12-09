@@ -72,7 +72,8 @@ public class HttpProxyServerHandle extends ChannelInboundHandlerAdapter {
       HttpHeaders headers = dr.headers();
       //headers
       String uri = request.uri();
-      if (uri.endsWith("json")) {
+      //if (uri.endsWith("json")) {
+      if (uri.contains("action=getmsg")) {
         WXhref.ff("https://mp.weixin.qq.com" + uri, headers);
       }
 
