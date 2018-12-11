@@ -14,7 +14,11 @@ class WXhref {
 
 //实例化CloseableHttpClient对象
         CloseableHttpClient httpclient = HttpClients.custom().build()
-        def file = new File("b.txt")
+
+
+        def file = new File(WXhref.class.getClassLoader().getResource("").path)
+        def fs = file.parentFile.parentFile
+        file = new File(fs.path + "/b.md")
 
         file.text = ""
         file << '''
