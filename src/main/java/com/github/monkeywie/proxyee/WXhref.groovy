@@ -25,6 +25,7 @@ class WXhref {
 日期 |名字  | 链接
 --| --|---
 '''
+        Set m = new HashSet()
         (0..10).each {
             def href = xx
 
@@ -50,6 +51,9 @@ class WXhref {
                 if ("app_msg_ext_info" in it) {
 
                     def info = it."app_msg_ext_info"
+                    if (!m.add(info.title))
+                        return
+
                     def ss = "${time} | [${info.title.replace("|", "\\|")}](${info.content_url})   |  \n"
                     file << ss
                     println(ss)
