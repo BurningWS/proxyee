@@ -94,12 +94,14 @@ public class HttpProxyServerHandle extends ChannelInboundHandlerAdapter {
               HttpProxyServer.SUCCESS);
           ctx.writeAndFlush(response);
           ctx.channel().pipeline().remove("httpCodec");
+          //fix issue #42
+          ReferenceCountUtil.release(msg);
           return;
         }
       }
       interceptPipeline = buildPipeline();
       interceptPipeline.setRequestProto(new RequestProto(host, port, isSsl));
-      //fix issues #27
+      //fix issue #27
       if (request.uri().indexOf("/") != 0) {
         URL url = new URL(request.uri());
         request.setUri(url.getFile());
@@ -152,7 +154,8 @@ public class HttpProxyServerHandle extends ChannelInboundHandlerAdapter {
   private void handleProxyData(Channel channel, Object msg, boolean isHttp)
       throws Exception {
     if (cf == null) {
-      if (isHttp && !(msg instanceof HttpRequest)) {  //connection异常 还有HttpContent进来，不转发
+      //connection异常 还有HttpContent进来，不转发
+      if (isHttp && !(msg instanceof HttpRequest)) {
         return;
       }
       ProxyHandler proxyHandler = ProxyHandleFactory.build(proxyConfig);
